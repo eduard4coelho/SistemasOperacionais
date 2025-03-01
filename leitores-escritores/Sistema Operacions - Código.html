@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <title>Semáforos - Produtor | Consumidor</title>
+
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background-color: #07161b;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin-left: 30px;
+            overflow-y: scroll;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 500px;
+        }
+
+        .buffer-items {
+            display: flex;
+            margin-bottom: 50px;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+
+        .buffer {
+            width: 400px;
+            height: auto;
+            border: 2px dashed #58d5d3;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1f1f1f;
+            border-radius: 8px;
+            box-shadow: 0px 0px 80px 30px #58d5d354, 0 0 0 1px #58d5d354;
+        }
+
+        .buffer-item {
+            width: 100px;
+            height: 100px;
+            background-color: #3a3a3a;
+            margin: 5px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            text-align: center;
+        }
+
+        .counters {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .counter {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #58d5d3;
+            text-align: center;
+            line-height: 30px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #2c2c2c;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0px 0px 12px 1px #58d5d354, 0 0 0 0px #58d5d354;
+        }
+
+        .circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+            font-size: 24px;
+            padding: 8px;
+        }
+
+        .circle-producer {
+            background-color: #58d5d399;
+            box-shadow: 0px 0px 12px -3px #58d5d399, 0 0 0 0px #58d5d354;
+        }
+
+        .circle-consumer {
+            background-color: #b8790999;
+            box-shadow: 0px 0px 12px -3px #b8790999, 0 0 0 0px #58d5d354;
+        }
+
+        .arrow {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 20px solid #e0e0e0;
+            border-radius: 8px;
+            margin-right: 15px;
+            margin-left: 15px;
+        }
+
+        button {
+            padding: 15px 25px;
+            margin: 10px;
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button-producer {
+            background-color: #58d5d399;
+            box-shadow: 0px 0px 12px -3px #58d5d399, 0 0 0 0px #58d5d354;
+        }
+
+        .button-consumer {
+            background-color: #b8790999;
+            box-shadow: 0px 0px 12px -3px #b8790999, 0 0 0 0px #58d5d354;
+        }
+
+        .button-producer:hover {
+            background-color: #58d5d399;
+        }
+
+        .button-producer:active {
+            background-color: #58d5d3;
+        }
+
+        .button-consumer:hover {
+            background-color: #b8790999;
+        }
+
+        .button-consumer:active {
+            background-color: #b87909;
+        }
+
+        .button-producer:hover {
+            background-color: #58d5d399;
+        }
+
+        .button-producer:active {
+            background-color: #58d5d3;
+        }
+
+        .button-test {
+            background: #efd50d99;
+        }
+
+        .button-test:active {
+            background: #efd50d;
+        }
+
+        .button-test:disabled,
+        .button-test[disabled] {
+            border: 1px solid #999999;
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        .buffer-title {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        .pointer {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+        }
+
+        .pointer-in {
+            background-color: #58d5d3;
+            box-shadow: 0px 0px 12px -3px #58d5d399, 0 0 0 0px #58d5d354;
+        }
+
+        .pointer-out {
+            background-color: #b87909;
+            box-shadow: 0px 0px 12px -3px #b8790999, 0 0 0 0px #58d5d354;
+        }
+
+        .container-counters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container-counters span {
+            width: 50px;
+        }
+
+        .message {
+            color: #ff4d4d;
+            font-weight: bold;
+            padding: 8px 18px 8px 18px;
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            max-width: 250px;
+            background: #ff4d4d29;
+            border-radius: 10px;
+        }
+
+        .log-area {
+            width: 70%;
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #58d5d3;
+            background-color: #1f1f1f;
+            color: #e0e0e0;
+            font-size: 14px;
+            border-radius: 8px;
+            height: 200px;
+            overflow-y: scroll;
+            box-shadow: 0px 0px 12px -3px #58d5d399, 0 0 0 0px #58d5d354;
+        }
+
+        .log-message {
+            margin: 0.2em 0;
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            /* Impede que as linhas se quebrem */
+            overflow: hidden;
+            /* Esconde o texto que ultrapassa o tamanho */
+            text-overflow: ellipsis;
+            /* Adiciona "..." no final do texto */
+        }
+
+        .log-producer-wait {
+            background-color: #58d5d320;
+            color: #58d5d3;
+            font-style: italic;
+        }
+
+        .log-consumer-wait {
+            background-color: #b8790920;
+            color: #b87909;
+            font-style: italic;
+        }
+
+
+        .log-buffer-full {
+            background-color: #ff4d4d20;
+            color: #ff4d4d;
+        }
+
+        .log-buffer-empty {
+            background-color: #8dff4d20;
+            color: #8dff4d;
+        }
+
+        .log-action {
+            background-color: #0f3a4720;
+            color: #e0e0e0;
+        }
+
+        /* ===== Scrollbar CSS ===== */
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #07161b;
+            -webkit-border-radius: 10px;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            -webkit-border-radius: 10px;
+            border-radius: 10px;
+            background: #58d5d3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="circle circle-producer">P</div>
+        <div class="arrow"></div>
+        <div class="buffer">
+            <div class="buffer-items">
+                <div id="in-pointer" class="pointer pointer-in" style="display: none;">IN</div>
+                <div id="out-pointer" class="pointer pointer-out" style="display: none;">OUT</div>
+                <div id="buffer-item-1" class="buffer-item"></div>
+                <div id="buffer-item-2" class="buffer-item"></div>
+                <div id="buffer-item-3" class="buffer-item"></div>
+            </div>
+            <div class="counters">
+                <span class="container-counters">
+                    <span style="margin-left: 5px; color: #e0e0e0;">mutex</span>
+                    <div class="counter" id="mutex-counter">1</div>
+                </span>
+                <span class="container-counters">
+                    <span style="margin-left: 5px; color: #e0e0e0;">cheias</span>
+                    <div class="counter" id="full-counter">0</div>
+                </span>
+                <span class="container-counters">
+                    <span style="margin-left: 5px; color: #e0e0e0;">vazias</span>
+                    <div class="counter" id="empty-counter">3</div>
+                </span>
+            </div>
+            <div class="buffer-title">Buffer compartilhado</div>
+        </div>
+        <div class="arrow" style="transform: rotate(180deg);"></div>
+        <div class="circle circle-consumer">C</div>
+    </div>
+
+    <div>
+        <button id="produceButton1" class="button-producer">Produzir 1</button>
+        <button id="produceButton2" class="button-producer">Produzir 2</button>
+        <button id="consumeButton1" class="button-consumer">Consumir 1</button>
+        <button id="consumeButton2" class="button-consumer">Consumir 2</button>
+        <button id="runTestButton" class="button-test">Executar Teste</button>
+    </div>
+
+    <!-- Adicione uma seção para exibir mensagens -->
+    <div id="message" class="message"></div>
+
+    <div id="log-area" class="log-area"></div>
+
+    <script>
+        // Classe Semaphore: Representa um semáforo usado para controle de acesso e sincronização.
+        class Semaphore {
+            constructor(value) {
+                // O valor inicial do semáforo (permite gerenciar o número de recursos disponíveis).
+                this.value = value;
+
+                // Fila para armazenar funções de resolução pendentes (threads aguardando).
+                this.queue = [];
+            }
+
+            // Método assíncrono para diminuir o valor do semáforo (aguardar acesso a um recurso).
+            async wait() {
+                if (this.value > 0) {
+                    // Caso haja recursos disponíveis, decrementar o valor.
+                    this.value--;
+                } else {
+                    // Se não houver recursos, colocar a execução atual em espera.
+                    await new Promise(resolve => this.queue.push(resolve));
+                }
+            }
+
+            // Método para liberar um recurso, aumentando o valor do semáforo ou resolvendo uma espera pendente.
+            signal() {
+                if (this.queue.length > 0) {
+                    // Resolver a promessa mais antiga na fila.
+                    const resolve = this.queue.shift();
+                    resolve();
+                } else {
+                    // Aumentar o valor do semáforo, indicando um recurso liberado.
+                    this.value++;
+                }
+            }
+
+            // Método para obter o valor atual do semáforo.
+            getValue() {
+                return this.value;
+            }
+        }
+
+        // Classe Buffer: Representa um buffer circular com operações de inserção e remoção.
+        class Buffer {
+            constructor(size) {
+                this.size = size; // Tamanho máximo do buffer.
+                this.buffer = new Array(size).fill(null); // Inicializa o buffer com valores nulos.
+                this.in = 0; // Índice de inserção.
+                this.out = 0; // Índice de remoção.
+                this.counter = 0; // Contador para gerar identificadores de itens.
+            }
+
+            // Método para inserir um item no buffer.
+            insert(item) {
+                this.buffer[this.in] = item; // Insere o item no índice atual de 'in'.
+                this.in = (this.in + 1) % this.size; // Atualiza o índice de forma circular.
+            }
+
+            // Método para remover um item do buffer.
+            remove() {
+                const item = this.buffer[this.out]; // Obtém o item no índice atual de 'out'.
+                this.buffer[this.out] = null; // Remove o item do buffer.
+                this.out = (this.out + 1) % this.size; // Atualiza o índice de forma circular.
+                return item; // Retorna o item removido.
+            }
+
+            // Método para obter o próximo identificador único de item.
+            getNextItemId() {
+                return ++this.counter;
+            }
+
+            // Método para calcular quantos espaços no buffer estão preenchidos.
+            getFilledCount() {
+                if (this.in === this.out && this.buffer[this.in] !== null) {
+                    // Caso especial: buffer completamente cheio.
+                    return this.size;
+                }
+                if (this.in >= this.out) {
+                    // Espaços ocupados em uma única passagem.
+                    return this.in - this.out;
+                }
+                // Espaços ocupados em duas passagens (circular).
+                return this.size - this.out + this.in;
+            }
+        }
+
+        // Tamanho do buffer e criação dos semáforos para controlar o acesso.
+        const bufferSize = 3;
+        const buffer = new Buffer(bufferSize);
+        const mutex = new Semaphore(1); // Controle de exclusão mútua.
+        const empty = new Semaphore(bufferSize); // Contador de espaços vazios no buffer.
+        const full = new Semaphore(0); // Contador de itens disponíveis no buffer.
+
+        // Função assíncrona que representa um produtor.
+        async function producer(id) {
+            // Verifica se há espaço no buffer antes de produzir.
+            if (empty.getValue() <= 0) {
+                // logMessage(`Buffer cheio! Produtor ${id} está aguardando...`, 'buffer-full');
+                logMessage(`Buffer cheio! Não pode mais produzir`, 'buffer-full'); // AJUSTE SOLICITADO
+                displayMessage(`Buffer cheio! Produtor ${id} não pode produzir no momento.`);
+
+                return false; // AJUSTE SOLICITADO
+            }
+
+            logMessage(`Produtor ${id} aguardando para acessar o buffer...`, 'producer-wait');
+            await empty.wait(); // Espera por espaço disponível no buffer.
+            await mutex.wait(); // Obtém acesso exclusivo ao buffer.
+
+            try {
+                logMessage(`Produtor ${id} acessou o buffer.`, 'log-action');
+                setBufferCritical(true); // Indica que o buffer está em uso crítico.
+
+                const itemId = buffer.getNextItemId();
+                const item = `Item ${itemId} (Produtor ${id})`;
+
+                buffer.insert(item); // Insere o item produzido no buffer.
+                logMessage(`Produtor ${id} produzindo: ${item}`, 'log-action');
+                console.log(`Produtor ${id} produzindo: ${item}`);
+                updateBufferView(); // Atualiza a visualização do buffer.
+                await delay(3000); // Simula o tempo de produção.
+            } finally {
+                setBufferCritical(false); // Libera o uso crítico do buffer.
+                mutex.signal(); // Libera o acesso exclusivo.
+                full.signal(); // Indica que há um novo item no buffer.
+                clearMessage(); // Limpa mensagens de status.
+            }
+        }
+
+        // Função assíncrona que representa um consumidor.
+        async function consumer(id) {
+            // Verifica se há itens no buffer antes de consumir.
+            if (full.getValue() <= 0) {
+                // logMessage(`Buffer vazio! Consumidor ${id} está aguardando...`, 'buffer-empty'); // AJUSTE SOLICITADO
+                logMessage(`Buffer vazio! Não pode consumir`, 'buffer-empty');
+                displayMessage(`Buffer vazio! Consumidor ${id} não pode consumir no momento.`);
+
+                return false;
+            }
+
+            logMessage(`Consumidor ${id} aguardando para acessar o buffer...`, 'consumer-wait');
+            await full.wait(); // Espera por itens disponíveis no buffer.
+            await mutex.wait(); // Obtém acesso exclusivo ao buffer.
+
+            try {
+                logMessage(`Consumidor ${id} acessou o buffer.`, 'log-action');
+                setBufferCritical(true); // Indica que o buffer está em uso crítico.
+
+                const item = buffer.remove(); // Remove um item do buffer.
+                logMessage(`Consumidor ${id} consumindo: ${item}`, 'log-action');
+                console.log(`Consumidor ${id} consumindo: ${item}`);
+                await delay(3000); // Simula o tempo de produção.
+                updateBufferView(); // Atualiza a visualização do buffer.
+            } finally {
+                setBufferCritical(false); // Libera o uso crítico do buffer.
+                mutex.signal(); // Libera o acesso exclusivo.
+                empty.signal(); // Indica que há um espaço vazio no buffer.
+                clearMessage(); // Limpa mensagens de status.
+            }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function setBufferCritical(isCritical) {
+            const bufferItems = document.querySelector('.buffer-items');
+            if (isCritical) {
+                bufferItems.style.backgroundColor = '#ff4d4d'; // Vermelho para indicar região crítica
+            } else {
+                bufferItems.style.backgroundColor = ''; // Remove o estilo para voltar ao padrão
+            }
+        }
+
+        function displayMessage(message) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+        }
+
+        function clearMessage() {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = '';
+        }
+
+        function logMessage(message, type) {
+            const logArea = document.getElementById('log-area');
+            const logEntry = document.createElement('p');
+            logEntry.textContent = message;
+            logEntry.classList.add('log-message');
+            if (type) {
+                logEntry.classList.add(`log-${type}`);
+            }
+            logArea.appendChild(logEntry);
+
+            // Manter a barra de rolagem sempre no final
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function updateBufferView() {
+            for (let i = 0; i < buffer.size; i++) {
+                const bufferItem = document.getElementById(`buffer-item-${i + 1}`);
+                bufferItem.textContent = buffer.buffer[i] || '';
+            }
+
+            const filledCount = buffer.getFilledCount();
+            const emptyCount = buffer.size - filledCount;
+
+            // Atualiza os valores dos contadores
+            document.getElementById('mutex-counter').textContent = mutex.getValue();
+            document.getElementById('full-counter').textContent = filledCount; // Exibe o número de posições ocupadas
+            document.getElementById('empty-counter').textContent = emptyCount; // Exibe o número de posições vazias
+
+            // Atualiza a posição dos apontadores
+            const inPointer = document.getElementById('in-pointer');
+            const outPointer = document.getElementById('out-pointer');
+
+            const bufferItems = document.querySelectorAll('.buffer-item');
+            const inElement = bufferItems[buffer.in];
+            const outElement = bufferItems[buffer.out];
+
+            if (inElement) {
+                inPointer.style.display = 'block';
+                inPointer.style.left = `${inElement.offsetLeft + inElement.offsetWidth / 2}px`;
+                inPointer.style.top = `${inElement.offsetTop - 22}px`;
+            }
+
+            if (outElement) {
+                outPointer.style.display = 'block';
+                outPointer.style.left = `${outElement.offsetLeft + outElement.offsetWidth / 2}px`;
+                outPointer.style.top = `${outElement.offsetTop + outElement.offsetHeight + 22}px`;
+            }
+        }
+
+        // Função para executar requisições aleatórias de produtores e consumidores
+        async function runRandomRequests(numRequests) {
+            document.getElementById("runTestButton").disabled = true;
+            for (let i = 0; i < numRequests; i++) {
+                // Escolha aleatoriamente entre produzir e consumir (50% de chance para cada).
+                const isProducer = Math.random() < 0.5;
+                const id = Math.floor(Math.random() * 2) + 1; // ID aleatório do produtor ou consumidor (1 ou 2)
+
+                if (isProducer) {
+                    await producer(id);
+                } else {
+                    await consumer(id);
+                }
+                updateBufferView();
+                await delay(1000); // Pequeno atraso para visualização
+            }
+            document.getElementById("runTestButton").disabled = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('produceButton1')?.addEventListener('click', async () => {
+                await producer(1);
+                updateBufferView();
+            });
+
+            document.getElementById('produceButton2')?.addEventListener('click', async () => {
+                await producer(2);
+                updateBufferView();
+            });
+
+            document.getElementById('consumeButton1')?.addEventListener('click', async () => {
+                await consumer(1);
+                updateBufferView();
+            });
+
+            document.getElementById('consumeButton2')?.addEventListener('click', async () => {
+                await consumer(2);
+                updateBufferView();
+            });
+
+            document.getElementById('runTestButton')?.addEventListener('click', async () => {
+                await runRandomRequests(20);
+            });
+
+            setTimeout(() => {
+                updateBufferView();
+            }, 1000)
+
+        });
+    </script>
+</body>
+
+</html>
